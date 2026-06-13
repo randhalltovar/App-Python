@@ -1,59 +1,94 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget
 from PyQt5.QtCore import Qt
 
 # CONSTANTES
 ANCHO, ALTO = 1000, 800
 TITULO = "Tardis"
 
-class CalendarioTab(QWidget):
-    def __init__(self):
+class MenuPrincipal(QWidget):
+    def __init__(self, stacked_widget):
         super().__init__()
+        self.stacked = stacked_widget
         layout = QVBoxLayout()
-        etiqueta = QLabel("Interfaz Calendario")
-        layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
+        
+        titulo = QLabel("Bienvenida")
+        
+        btn_calendario = QPushButton("Abrir Calendario")
+        btn_notas = QPushButton("Abrir Notas")
+        btn_writing = QPushButton("Abrir Writing")
+        
+        # Darles un ancho y largo fijo para que todos midan lo mismo y se vea uniforme
+        btn_calendario.setFixedWidth(200)
+        btn_notas.setFixedWidth(200)
+        btn_writing.setFixedWidth(200)
+        btn_calendario.setFixedHeight(30)
+        btn_notas.setFixedHeight(30)
+        btn_writing.setFixedHeight(30)
+        
+        # Conectamos los botones a las funciones que cambian la pantalla
+        btn_calendario.clicked.connect(self.ir_a_calendario)
+        btn_notas.clicked.connect(self.ir_a_notas)
+        btn_writing.clicked.connect(self.ir_a_writing)
+        
+        # Agregamos los widgets indicando que se centren horizontalmente
+        layout.addWidget(titulo, alignment=Qt.AlignHCenter)
+        layout.addWidget(btn_calendario, alignment=Qt.AlignHCenter)
+        layout.addWidget(btn_notas, alignment=Qt.AlignHCenter)
+        layout.addWidget(btn_writing, alignment=Qt.AlignHCenter)
+        
+        # Colocamos el resorte invisible al final para empujar todo hacia arriba
+        layout.addStretch()
+        
         self.setLayout(layout)
 
-class NotasTab(QWidget):
-    def __init__(self):
+    def ir_a_calendario(self):
+        self.stacked.setCurrentIndex(1)
+
+    def ir_a_notas(self):
+        self.stacked.setCurrentIndex(2)
+
+    def ir_a_writing(self):
+        self.stacked.setCurrentIndex(3)
+
+class PantallaBase(QWidget):
+    def __init__(self, stacked_widget, texto_titulo):
         super().__init__()
+        self.stacked = stacked_widget
         layout = QVBoxLayout()
-        etiqueta = QLabel("Interfaz Notas")
-        layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
+        
+        etiqueta = QLabel(texto_titulo)
+        etiqueta.setAlignment(Qt.AlignCenter)
+        
+        btn_volver = QPushButton("Volver al Menú Principal")
+        btn_volver.clicked.connect(self.volver_menu)
+        
+        layout.addWidget(etiqueta)
+        layout.addWidget(btn_volver)
         self.setLayout(layout)
 
-class WritingTab(QWidget):
-    def __init__(self):
-        super().__init__()
-        layout = QVBoxLayout()
-        etiqueta = QLabel("Interfaz Writing")
-        layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
-        self.setLayout(layout)
+    def volver_menu(self):
+        self.stacked.setCurrentIndex(0)
 
 class MainWindow(QWidget):
-    def __init__(self, parent=None, flags=Qt.WindowFlags()):
-        super().__init__(parent=parent, flags=flags)
-        
+    def __init__(self):
+        super().__init__()
         self.resize(ANCHO, ALTO)
         self.setWindowTitle(TITULO)
         
-        # 1. Crear el gestor de pestañas
-        self.tabs = QTabWidget()
+        self.stacked_widget = QStackedWidget()
         
-        # 2. Instanciar las clases de cada sección
-        self.tab_calendario = CalendarioTab()
-        self.tab_notas = NotasTab()
-        self.tab_writing = WritingTab()
+        self.menu = MenuPrincipal(self.stacked_widget)
+        self.calendario = PantallaBase(self.stacked_widget, "Interfaz Minimalista del Calendario")
+        self.notas = PantallaBase(self.stacked_widget, "Espacio para Notas y Libretas")
+        self.writing = PantallaBase(self.stacked_widget, "Carpetas, Capítulos y Fichas de Personajes")
         
-        # 3. Agregar las instancias al gestor de pestañas
-        self.tabs.addTab(self.tab_calendario, "Calendario")
-        self.tabs.addTab(self.tab_notas, "Notas")
-        self.tabs.addTab(self.tab_writing, "Writing")
+        self.stacked_widget.addWidget(self.menu)
+        self.stacked_widget.addWidget(self.calendario)
+        self.stacked_widget.addWidget(self.notas)
+        self.stacked_widget.addWidget(self.writing)
         
-        # 4. Crear un layout principal para la ventana y agregar las pestañas
         main_layout = QVBoxLayout()
-        main_layout.addWidget(self.tabs)
-        
-        # 5. Aplicar el layout a la ventana principal
+        main_layout.addWidget(self.stacked_widget)
         self.setLayout(main_layout)
 
 def run():
@@ -64,4 +99,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-   
