@@ -1,20 +1,26 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget
 from PyQt5.QtCore import Qt
 
-# CONSTANTES
+# --- CONSTANTES GLOBALES ---
 ANCHO, ALTO = 1000, 800
 TITULO = "Tardis"
 
+# --- ZONA DE MENÚ ---
 class MenuPrincipal(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
+        # Referencia al gestor de pantallas para poder decirle a donde ir luego
         self.stacked = stacked_widget
-        layout = QVBoxLayout()
         
-        titulo = QLabel("Bienvenida")
-
+        # Diseño vertical principal para el menú
+        layout = QVBoxLayout()
+        # Espacio de 15 píxeles entre cada elemento para que no se vean amontonados
         layout.setSpacing(15)
         
+        # Título de la partecita de arriba del menu
+        titulo = QLabel("Bienvenida")
+        
+        # Creamos los botones de navegación
         btn_calendario = QPushButton("Abrir Calendario")
         btn_notas = QPushButton("Abrir Notas")
         btn_writing = QPushButton("Abrir Writing")
@@ -27,80 +33,142 @@ class MenuPrincipal(QWidget):
         btn_notas.setFixedHeight(30)
         btn_writing.setFixedHeight(30)
         
-        # Conectamos los botones a las funciones que cambian la pantalla
+        # Conectamos el evento "clic" de cada boton con su función de viaje correspondiente
         btn_calendario.clicked.connect(self.ir_a_calendario)
         btn_notas.clicked.connect(self.ir_a_notas)
         btn_writing.clicked.connect(self.ir_a_writing)
-
-        # PRIMER RESORTE: Empuja todo el contenido hacia abajo
+        
+        # Empuja todo el contenido hacia abajo
         layout.addStretch()
         
-        # Agregamos los widgets indicando que se centren horizontalmente
+        # Agregamos los elementos al diseño, asegurando que se centren de manera horizontal
         layout.addWidget(titulo, alignment=Qt.AlignHCenter)
         layout.addWidget(btn_calendario, alignment=Qt.AlignHCenter)
         layout.addWidget(btn_notas, alignment=Qt.AlignHCenter)
         layout.addWidget(btn_writing, alignment=Qt.AlignHCenter)
         
-        # SEGUNDO RESORTE: Empuja todo el contenido hacia arriba
+        # Empuja todo el contenido hacia arriba
+        # Al tener un resorte arriba y otro abajo, los botones quedan atrapados en el centro exacto
         layout.addStretch()
         
+        # Aplico diseño ensamblado a la ventana del menú
         self.setLayout(layout)
 
+    # Funciones de navegacion, tipo cambian el índice del mazo de cartas para mostrar otra pantalla
     def ir_a_calendario(self):
         self.stacked.setCurrentIndex(1)
-
     def ir_a_notas(self):
         self.stacked.setCurrentIndex(2)
-
     def ir_a_writing(self):
         self.stacked.setCurrentIndex(3)
 
-class PantallaBase(QWidget):
-    def __init__(self, stacked_widget, texto_titulo):
+# --- ZONA DE TRABAJO 1: CALENDARIO ---
+class CalendarioPantalla(QWidget):
+    def __init__(self, stacked_widget):
         super().__init__()
         self.stacked = stacked_widget
         layout = QVBoxLayout()
         
-        etiqueta = QLabel(texto_titulo)
-        etiqueta.setAlignment(Qt.AlignCenter)
+        # Etiqueta temporal mientras mientras hago el calendarioo
+        titulo = QLabel("diseño de calendario")
         
+        # Boton para poder regresar al menu
         btn_volver = QPushButton("Volver al Menú Principal")
         btn_volver.clicked.connect(self.volver_menu)
+        # Cambio del ancho y alto pq esta muy angosto
+        btn_volver.setFixedWidth(200)
+        btn_volver.setFixedHeight(30)
         
-        layout.addWidget(etiqueta)
-        layout.addWidget(btn_volver)
+        # Agregamos los elementos y los centramos en la pantalla
+        layout.addWidget(titulo, alignment=Qt.AlignCenter)
+        layout.addWidget(btn_volver, alignment=Qt.AlignCenter)
+        self.setLayout(layout)
+
+    # Función para regresar al menú inicial, el cual siempre será el índice 0
+    def volver_menu(self):
+        self.stacked.setCurrentIndex(0)
+
+# --- ZONA DE TRABAJO 2: NOTAS ---
+class NotasPantalla(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked = stacked_widget
+        layout = QVBoxLayout()
+        
+        titulo = QLabel("diseño de notas")
+        btn_volver = QPushButton("Volver al Menú Principal")
+        btn_volver.clicked.connect(self.volver_menu)
+
+        # Cambio del ancho y alto pq esta muy angosto
+        btn_volver.setFixedWidth(200)
+        btn_volver.setFixedHeight(30)
+        
+        layout.addWidget(titulo, alignment=Qt.AlignCenter)
+        layout.addWidget(btn_volver, alignment=Qt.AlignCenter)
         self.setLayout(layout)
 
     def volver_menu(self):
         self.stacked.setCurrentIndex(0)
 
+# --- ZONA DE TRABAJO 3: WRITING ---
+class WritingPantalla(QWidget):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked = stacked_widget
+        layout = QVBoxLayout()
+        
+        titulo = QLabel("diseño de carpetas y fichas")
+        btn_volver = QPushButton("Volver al Menú Principal")
+        btn_volver.clicked.connect(self.volver_menu)
+
+        # Cambio del ancho y alto pq esta muy angosto
+        btn_volver.setFixedWidth(200)
+        btn_volver.setFixedHeight(30)
+        
+        layout.addWidget(titulo, alignment=Qt.AlignCenter)
+        layout.addWidget(btn_volver, alignment=Qt.AlignCenter)
+        self.setLayout(layout)
+
+    def volver_menu(self):
+        self.stacked.setCurrentIndex(0)
+
+# --- ZONA DE ENSAMBLAJE PRINCIPAL ---
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        # Configuramos el tamaño y el título usando las constantes globales definidas arriba
         self.resize(ANCHO, ALTO)
         self.setWindowTitle(TITULO)
         
+        # Creamos el gestor de pantallas, que funciona como un mazo de cartas (lo de arriba, que le puse que si 1, 2)
         self.stacked_widget = QStackedWidget()
         
+        # Instanciamos cada una de las pantallas pasandoles el gestor para que puedan comunicarse
         self.menu = MenuPrincipal(self.stacked_widget)
-        self.calendario = PantallaBase(self.stacked_widget, "Interfaz Minimalista del Calendario")
-        self.notas = PantallaBase(self.stacked_widget, "Espacio para Notas y Libretas")
-        self.writing = PantallaBase(self.stacked_widget, "Carpetas, Capítulos y Fichas de Personajes")
+        self.calendario = CalendarioPantalla(self.stacked_widget)
+        self.notas = NotasPantalla(self.stacked_widget)
+        self.writing = WritingPantalla(self.stacked_widget)
         
-        self.stacked_widget.addWidget(self.menu)
-        self.stacked_widget.addWidget(self.calendario)
-        self.stacked_widget.addWidget(self.notas)
-        self.stacked_widget.addWidget(self.writing)
+        # Agregamos las pantallas al gestor en orden
+        # El orden en que se agregan define su número de índice interno (0, 1, 2, 3)
+        self.stacked_widget.addWidget(self.menu)         # Índice 0
+        self.stacked_widget.addWidget(self.calendario)   # Índice 1
+        self.stacked_widget.addWidget(self.notas)        # Índice 2
+        self.stacked_widget.addWidget(self.writing)      # Índice 3
         
+        # Creamos un diseño para la ventana principal y empaquetamos el gestor de pantallas dentro
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.stacked_widget)
         self.setLayout(main_layout)
 
+# --- ZONA DE EJECUCIÓN ---
+# función motor que arranca todo el sistema visual
 def run():
     app = QApplication([])
     main_window = MainWindow()
     main_window.show() 
     app.exec_()
 
+# Esta condición de seguridad asegura que el código solo se ejecute si corremos este archivo directamente
 if __name__ == "__main__":
     run()
