@@ -11,27 +11,6 @@ from PyQt5.QtGui import QColor, QTextCharFormat, QBrush, QFont, QTextCursor, QTe
 # --- CONSTANTES GLOBALES ---
 ANCHO, ALTO = 1000, 800
 TITULO = "Tardis"
-# --- PALETA DE COLORES ---
-COLORES = {
-    "primario": "#655A7C",
-    "secundario": "#AB92BF",
-    "fondo_barra": "#AFC1D6",
-    "fondo_lista": "#CEF9F2",
-    "acento": "#D6CA98",
-    "texto": "#222222",
-    "blanco": "#FFFFFF"
-}
-
-# --- HOJA DE ESTILOS GLOBAL ---
-ESTILO_GLOBAL = f"""
-    QWidget {{ background-color: {COLORES['blanco']}; font-family: 'Segoe UI', sans-serif; }}
-    QPushButton {{ 
-        background-color: {COLORES['primario']}; color: white; border-radius: 8px; padding: 8px; 
-    }}
-    QPushButton:hover {{ background-color: {COLORES['secundario']}; }}
-    QTextEdit, QLineEdit {{ border: 1px solid {COLORES['fondo_barra']}; border-radius: 5px; padding: 5px; }}
-    QListWidget {{ background-color: {COLORES['fondo_lista']}; border: none; }}
-"""
 
 # --- CLASE PERSONALIZADA PARA EL EDITOR DE TEXTO (DRAG & DROP E IMÁGENES) ---
 class EditorMinimalista(QTextEdit):
