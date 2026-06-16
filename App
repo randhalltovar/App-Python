@@ -132,7 +132,7 @@ class MenuPrincipal(QWidget):
         for btn in (btn_calendario, btn_notas):
             btn.setFixedWidth(320)
             btn.setFixedHeight(55)
-            # Delega el diseño de botones al StyleSheet global de MainWindow
+            # Delega el diseño de botones al StyleSheet global de MainWindow.
         
         btn_calendario.clicked.connect(lambda: self.stacked.setCurrentIndex(1))
         btn_notas.clicked.connect(lambda: self.stacked.setCurrentIndex(2))
@@ -169,7 +169,7 @@ class CalendarioPantalla(QWidget):
         # que se vean los números y encabezados que se me perdieron con el contraste
         estilo = """
             QCalendarWidget { 
-                border: 1px solid rgba(0, 179, 170, 0.3);
+                border: 1px solid rgba(49, 41, 95, 0.2);
                 border-radius: 24px; 
                 background: #F9F5F0; 
             }
@@ -203,26 +203,6 @@ class CalendarioPantalla(QWidget):
             #qt_calendar_prevmonth, #qt_calendar_nextmonth { 
                 qproperty-icon: none; icon-size: 0px; width: 0px; height: 0px;
             }
-            QCalendarWidget QHeaderView { border: none; background-color: #F9F5F0; }
-            QCalendarWidget QHeaderView::section {
-                background-color: #F9F5F0;
-                color: #31295f; 
-                font-family: 'Segoe UI', sans-serif;
-                font-weight: bold;
-                font-size: 13px;
-                border: none;
-                padding: 8px 0px;
-            }
-            QCalendarWidget QTableView { 
-                border: none;
-                background: #F9F5F0; 
-                color: #31295f; 
-                selection-background-color: #E9445F; 
-                selection-color: #F9F5F0; 
-                font-family: 'Segoe UI', sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-            }
             /* Ocultar flechas de navegación completamente pq se ven horribles */
             #qt_calendar_prevmonth, 
             #qt_calendar_nextmonth { 
@@ -237,12 +217,33 @@ class CalendarioPantalla(QWidget):
                 border: none;
                 background: transparent;
             }
+            QCalendarWidget QHeaderView { border: none; background-color: #F9F5F0; }
+            QCalendarWidget QHeaderView::section {
+                background-color: #F9F5F0;
+                color: #31295f; 
+                font-family: 'Segoe UI', sans-serif;
+                font-weight: bold;
+                font-size: 13px;
+                border: none;
+                padding: 8px 0px;
+            }
+            QCalendarWidget QTableView { 
+                border: 1px solid rgba(49, 41, 95, 0.08);
+                border-radius: 16px;
+                background: #F9F5F0; 
+                color: #31295f; 
+                selection-background-color: #E9445F; 
+                selection-color: #F9F5F0; 
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+            }
             QCalendarWidget QAbstractItemView:disabled { color: rgba(49, 41, 95, 0.4); }
             QCalendarWidget QMenu {
                 background-color: #F9F5F0; color: #31295f; border: 1px solid rgba(0, 179, 170, 0.25); border-radius: 12px;
             }
             QCalendarWidget QMenu::item:selected { background-color: #E9445F; color: #F9F5F0; }
-        """ 
+        """
         self.calendario.setStyleSheet(estilo)
         
         self.panel_recordatorios = QFrame()
@@ -257,12 +258,34 @@ class CalendarioPantalla(QWidget):
         self.lbl_fecha.setStyleSheet("font-size: 16px; font-weight: 600; color: #F9F5F0;")
         
         btn_opciones = QPushButton(" Opciones ") 
-        btn_opciones.setStyleSheet("background-color: #00B3AA; color: #F9F5F0; border-radius: 10px; font-weight: bold;")
+        btn_opciones.setStyleSheet("""
+            QPushButton { background-color: #00B3AA; color: #F9F5F0; border-radius: 10px; font-weight: bold; padding: 4px 8px; }
+            QPushButton:hover { background-color: #00968F; }
+            QPushButton:pressed { background-color: #007A74; }
+        """)
         btn_opciones.setMenu(self.crear_menu_opciones())
         
         header_layout.addWidget(self.lbl_fecha)
         header_layout.addStretch()
         header_layout.addWidget(btn_opciones)
+        
+        self.input_nota = QTextEdit()
+
+        botones_layout = QHBoxLayout()
+        self.btn_guardar = QPushButton("Guardar")
+        self.btn_guardar.setStyleSheet("""
+            QPushButton { background-color: #E9445F; color: #F9F5F0; border-radius: 10px; padding: 8px; font-weight: bold; }
+            QPushButton:hover { background-color: #C8324B; }
+            QPushButton:pressed { background-color: #A62137; }
+        """)
+        self.btn_guardar.clicked.connect(self.guardar_nota)
+        
+        self.btn_eliminar = QPushButton("Eliminar")
+        self.btn_eliminar.setStyleSheet("""
+            QPushButton { background-color: transparent; color: #E9445F; border: 2px solid #E9445F; border-radius: 10px; padding: 8px; font-weight: bold; }
+            QPushButton:hover { background-color: rgba(233, 68, 95, 0.1); color: #C8324B; border-color: #C8324B; }
+            QPushButton:pressed { background-color: rgba(233, 68, 95, 0.2); }
+        """)
         
         self.input_nota = QTextEdit()
         self.input_nota.setPlaceholderText("Escribe aquí tu recordatorio...")
@@ -344,13 +367,22 @@ class CalendarioPantalla(QWidget):
 
     def eliminar_nota(self):
         fecha = self.calendario.selectedDate()
-        key = self.obtener_key_actual(fecha)
-        if key in self.recordatorios:
-            del self.recordatorios[key]
-            self.guardar_datos()
-            self.input_nota.clear()
-            self.aplicar_formatos_visibles()
-            self.btn_eliminar.hide()
+        # Buscamos en todas las combinaciones posibles de almacenamiento
+        keys = [
+            (fecha.day(), fecha.month(), fecha.year(), "Ninguna"), 
+            (fecha.day(), fecha.month(), None, "Anual"), 
+            (fecha.day(), None, None, "Mensual")
+        ]
+        
+        for key in keys:
+            if key in self.recordatorios:
+                del self.recordatorios[key]
+                break # Rompemos el ciclo una vez que encontramos y eliminamos el registro
+                
+        self.guardar_datos()
+        self.input_nota.clear()
+        self.aplicar_formatos_visibles()
+        self.btn_eliminar.hide()
 
     def obtener_key_actual(self, fecha):
         if self.tipo_repeticion == "Anual": return (fecha.day(), fecha.month(), None, "Anual")
@@ -432,14 +464,21 @@ class NotasPantalla(QWidget):
 
         self.btn_nueva_nota = QPushButton("+ Nueva Nota")
         self.btn_nueva_nota.setFixedHeight(48)
-        self.btn_nueva_nota.setStyleSheet("background-color: #E9445F; color: #F9F5F0; border-radius: 14px; font-weight: bold;")
+        self.btn_nueva_nota.setStyleSheet("""
+            QPushButton { background-color: #E9445F; color: #F9F5F0; border-radius: 14px; font-weight: bold; }
+            QPushButton:hover { background-color: #C8324B; }
+            QPushButton:pressed { background-color: #A62137; }
+        """)
         self.btn_nueva_nota.clicked.connect(self.crear_nueva_nota)
 
         self.btn_eliminar_nota = QPushButton("Eliminar Nota")
         self.btn_eliminar_nota.setFixedHeight(48)
-        self.btn_eliminar_nota.setStyleSheet("background-color: transparent; color: #E9445F; border: 2px solid #E9445F; border-radius: 14px; font-weight: bold;")
+        self.btn_eliminar_nota.setStyleSheet("""
+            QPushButton { background-color: transparent; color: #E9445F; border: 2px solid #E9445F; border-radius: 14px; font-weight: bold; }
+            QPushButton:hover { background-color: rgba(233, 68, 95, 0.1); color: #C8324B; border-color: #C8324B; }
+            QPushButton:pressed { background-color: rgba(233, 68, 95, 0.2); }
+        """)
         self.btn_eliminar_nota.clicked.connect(self.eliminar_nota_actual)
-        self.btn_eliminar_nota.hide()
 
         self.lista_notas = QListWidget()
         self.lista_notas.setStyleSheet("""
