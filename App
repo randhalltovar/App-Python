@@ -118,8 +118,8 @@ class MenuPrincipal(QWidget):
         
         titulo = QLabel("Bienvenida")
         titulo.setStyleSheet("""
-            font-size: 46px; 
-            font-weight: 300; 
+            font-size: 80px; 
+            font-weight: 600; 
             font-family: 'Segoe UI Light', 'Inter', sans-serif; 
             color: #690571;
             margin-bottom: 35px;
@@ -130,8 +130,8 @@ class MenuPrincipal(QWidget):
         btn_notas = QPushButton("Abrir Notas")
         
         for btn in (btn_calendario, btn_notas):
-            btn.setFixedWidth(320)
-            btn.setFixedHeight(55)
+            btn.setFixedWidth(300)
+            btn.setFixedHeight(50)
             # Delega el diseño de botones al StyleSheet global de MainWindow.
         
         btn_calendario.clicked.connect(lambda: self.stacked.setCurrentIndex(1))
@@ -158,10 +158,12 @@ class CalendarioPantalla(QWidget):
         
         layout = QVBoxLayout()
         layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(15) 
+        layout.setSpacing(20) 
         
         self.calendario = QCalendarWidget()
-        self.calendario.setGridVisible(False)
+        # OJITO 1, aqui cambio
+        # Se cambia a True para renderizar las líneas divisorias de las casillas de los días
+        self.calendario.setGridVisible(True)
         self.calendario.currentPageChanged.connect(self.aplicar_formatos_visibles)
         self.calendario.clicked.connect(self.cargar_recordatorio)
         
@@ -170,35 +172,38 @@ class CalendarioPantalla(QWidget):
         estilo = """
             QCalendarWidget { 
                 border: 1px solid rgba(49, 41, 95, 0.2);
-                border-radius: 24px; 
+                border-radius: 25px; 
                 background: #F9F5F0; 
             }
             QCalendarWidget QWidget#qt_calendar_navigationbar { 
                 background-color: #690571;
-                border-top-left-radius: 22px; 
-                border-top-right-radius: 22px; 
-                border-bottom: none; 
-                padding: 10px 14px; 
+                border-top-left-radius: 30px; 
+                border-top-right-radius: 30px; 
             }
+            /* Botones de mes y yearrr */
             QCalendarWidget QToolButton { 
                 font-family: 'Segoe UI', sans-serif;
-                font-size: 14px; 
+                font-size: 15px; 
                 color: #F9F5F0; 
                 font-weight: 600; 
                 background-color: rgba(249, 245, 240, 0.1);
-                border: 1px solid rgba(249, 245, 240, 0.2);
-                border-radius: 8px;
-                padding: 6px 14px;
-                margin: 2px 4px;
+                /* Contorno de botones de navegación */
+                border-radius: 5px;
+                padding: 7px 15px;
+                /*separo entre el year y el mes*/
+                margin-right: 15px;
             }
+            /*boton de los meses cuando estas por encimita*/
             QCalendarWidget QToolButton:hover {
                 background-color: rgba(249, 245, 240, 0.22);
                 border: 1px solid rgba(249, 245, 240, 0.4);
             }
+            /*boton de los meses, lo de presionado*/
             QCalendarWidget QToolButton:pressed {
                 background-color: #00B3AA;
                 border-color: #00B3AA;
             }
+            /*ocultar la flecha del mes*/
             QCalendarWidget QToolButton::menu-indicator { width: 0px; }
             #qt_calendar_prevmonth, #qt_calendar_nextmonth { 
                 qproperty-icon: none; icon-size: 0px; width: 0px; height: 0px;
@@ -217,69 +222,62 @@ class CalendarioPantalla(QWidget):
                 border: none;
                 background: transparent;
             }
-            QCalendarWidget QHeaderView { border: none; background-color: #F9F5F0; }
-            QCalendarWidget QHeaderView::section {
-                background-color: #F9F5F0;
-                color: #31295f; 
-                font-family: 'Segoe UI', sans-serif;
-                font-weight: bold;
-                font-size: 13px;
-                border: none;
-                padding: 8px 0px;
-            }
             QCalendarWidget QTableView { 
-                border: 1px solid rgba(49, 41, 95, 0.08);
-                border-radius: 16px;
-                background: #F9F5F0; 
-                color: #31295f; 
-                selection-background-color: #E9445F; 
-                selection-color: #F9F5F0; 
+                /*fondo completo*/
+                background: #f7f7f7; 
+                /*fondo cuando seleccionas*/
+                selection-background-color: #a3a3a3; 
+                /*Letra de seleccion*/
+                selection-color: #1e1e1e; 
                 font-family: 'Segoe UI', sans-serif;
                 font-size: 14px;
-                font-weight: 500;
+                /*grueso de la letras*/
+                font-weight: 600;
+                /*Contorno de cada casilla individual*/
+                gridline-color: #ffffff;
             }
-            QCalendarWidget QAbstractItemView:disabled { color: rgba(49, 41, 95, 0.4); }
-            QCalendarWidget QMenu {
-                background-color: #F9F5F0; color: #31295f; border: 1px solid rgba(0, 179, 170, 0.25); border-radius: 12px;
-            }
-            QCalendarWidget QMenu::item:selected { background-color: #E9445F; color: #F9F5F0; }
+            /*letras del mes siguiente*/
+            QCalendarWidget QAbstractItemView:disabled { 
+                color: #c4c4c4; 
+                }
         """
         self.calendario.setStyleSheet(estilo)
         
         self.panel_recordatorios = QFrame()
-        # lo que remueve las restricciones de altura que cortaban la interfaz del boton de guardado
-        self.panel_recordatorios.setStyleSheet("background-color: #31295f; border-radius: 24px; padding: 15px;")
-        
+        # lo que remueve las restricciones de altura que cortaban la interfaz del boton de guardado    #CON EL PADNG EL SIZE DE LA CAJA DIOS
+        self.panel_recordatorios.setStyleSheet("background-color: #31295f; border: 1px; border-radius: 20px; padding: 5px;")
         panel_layout = QVBoxLayout(self.panel_recordatorios)
-        panel_layout.setSpacing(10)
+        panel_layout.setSpacing(15) # Panel de recordatorio ESPAACIOOO ENTRE EL GUARDAR
         
         header_layout = QHBoxLayout()
+
         self.lbl_fecha = QLabel("Selecciona una fecha")
-        self.lbl_fecha.setStyleSheet("font-size: 16px; font-weight: 600; color: #F9F5F0;")
+        self.lbl_fecha.setStyleSheet("font-size: 25px; font-weight: 600; color: #F9F5F0;")
         
         btn_opciones = QPushButton(" Opciones ") 
         btn_opciones.setStyleSheet("""
             QPushButton { background-color: #00B3AA; color: #F9F5F0; border-radius: 10px; font-weight: bold; padding: 4px 8px; }
-            QPushButton:hover { background-color: #00968F; }
-            QPushButton:pressed { background-color: #007A74; }
+            QPushButton:hover { background-color: #00968F; } /*el color de paso pues*/
+            QPushButton:pressed { background-color: #007A74; } /*el color de presionado pues*/
         """)
+
         btn_opciones.setMenu(self.crear_menu_opciones())
-        
         header_layout.addWidget(self.lbl_fecha)
         header_layout.addStretch()
         header_layout.addWidget(btn_opciones)
-        
-        self.input_nota = QTextEdit()
 
         botones_layout = QHBoxLayout()
+        #BIEN BOTON GUARDAR
         self.btn_guardar = QPushButton("Guardar")
         self.btn_guardar.setStyleSheet("""
-            QPushButton { background-color: #E9445F; color: #F9F5F0; border-radius: 10px; padding: 8px; font-weight: bold; }
+            QPushButton { background-color: #E9445F; color: #F9F5F0; border-radius: 15px; font-weight: bold; }
             QPushButton:hover { background-color: #C8324B; }
             QPushButton:pressed { background-color: #A62137; }
         """)
         self.btn_guardar.clicked.connect(self.guardar_nota)
+        self.btn_guardar = QPushButton("Guardar")
         
+        #BIEN BOTON DE ELIMINAR
         self.btn_eliminar = QPushButton("Eliminar")
         self.btn_eliminar.setStyleSheet("""
             QPushButton { background-color: transparent; color: #E9445F; border: 2px solid #E9445F; border-radius: 10px; padding: 8px; font-weight: bold; }
@@ -291,7 +289,7 @@ class CalendarioPantalla(QWidget):
         self.input_nota.setPlaceholderText("Escribe aquí tu recordatorio...")
         # Uso de SizePolicy en lugar de alturas máximas absolutas para mayor flexibilidad visual
         self.input_nota.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.input_nota.setMinimumHeight(60)
+        self.input_nota.setMinimumHeight(100)
         self.input_nota.setStyleSheet("""
             QTextEdit {
                 background-color: rgba(249, 245, 240, 0.06); color: #F9F5F0; 
@@ -300,14 +298,42 @@ class CalendarioPantalla(QWidget):
             QTextEdit:focus { border: 1px solid #00B3AA; }
         """)
         
-        botones_layout = QHBoxLayout()
-        self.btn_guardar = QPushButton("Guardar")
-        # borra alturas fijas pq provocaban el corte del botón y usamos estilos estandar BOBIS
-        self.btn_guardar.setStyleSheet("background-color: #E9445F; color: #F9F5F0; border-radius: 10px; padding: 8px;")
+        # EFECTOS EN BOTONES (Hover y Active)
+        # eel sombreado (lo de simulado con border-bottom) y efecto de presion con el click
+        self.btn_guardar.setStyleSheet("""
+            QPushButton { 
+                background-color: #E9445F; color: #F9F5F0; border-radius: 10px; padding: 8px;
+                border-bottom: 3px solid #655A7C;
+            }
+            QPushButton:hover { 
+                background-color: #C8324B; 
+                border-bottom: 3px solid #AB92BF;
+            }
+            QPushButton:pressed { 
+                background-color: #A62137; 
+                border-bottom: 0px solid #655A7C; 
+                margin-top: 3px; 
+            }
+        """)
         self.btn_guardar.clicked.connect(self.guardar_nota)
         
         self.btn_eliminar = QPushButton("Eliminar")
-        self.btn_eliminar.setStyleSheet("background-color: transparent; color: #E9445F; border: 2px solid #E9445F; border-radius: 10px; padding: 8px;")
+        self.btn_eliminar.setStyleSheet("""
+            QPushButton { 
+                background-color: transparent; color: #E9445F; border: 2px solid #E9445F; 
+                border-radius: 10px; padding: 8px; 
+                border-bottom: 3px solid #E9445F;
+            }
+            QPushButton:hover { 
+                background-color: rgba(233, 68, 95, 0.1); color: #C8324B; border-color: #C8324B; 
+                border-bottom: 3px solid #C8324B;
+            }
+            QPushButton:pressed { 
+                background-color: rgba(233, 68, 95, 0.2); 
+                border-bottom: 0px solid #C8324B; 
+                margin-top: 3px;
+            }
+        """)
         self.btn_eliminar.clicked.connect(self.eliminar_nota)
         self.btn_eliminar.hide()
         
@@ -453,9 +479,9 @@ class NotasPantalla(QWidget):
         # PANEL IZQUIERDO
         panel_izquierdo = QFrame()
         panel_izquierdo.setStyleSheet("background-color: #31295f; border-radius: 24px; margin-right: 15px;")
-        layout_izquierdo = QVBoxLayout(panel_izquierdo)                        # El margin para separar las cajas
+        layout_izquierdo = QVBoxLayout(panel_izquierdo)                                        # El margin para separar las cajas
         layout_izquierdo.setContentsMargins(18, 18, 5, 18) # margenes AQUIIIIIIII <<<<<<<<<<<<
-        layout_izquierdo.setSpacing(15) # Separacion entre los botones y las notas 
+        layout_izquierdo.setSpacing(15) # Separacion entre los botones and las notas 
 
         self.barra_busqueda = QLineEdit()
         self.barra_busqueda.setPlaceholderText("🔍 Buscar nota...")
@@ -497,7 +523,7 @@ class NotasPantalla(QWidget):
         # PANEL DERECHO
         panel_derecho = QFrame()
         panel_derecho.setStyleSheet("background-color: #F9F5F0; border-radius: 24px; border: 1px solid rgba(26, 26, 46, 0.08); margin-left: 15px;")
-        layout_derecho = QVBoxLayout(panel_derecho)                                                             #El margin para separar las cajas
+        layout_derecho = QVBoxLayout(panel_derecho)                                                                                             #El margin para separar las cajas
         layout_derecho.setContentsMargins(40, 40, 40, 30) 
 
         self.input_titulo = QLineEdit()
@@ -512,6 +538,7 @@ class NotasPantalla(QWidget):
 
         layout_estado = QHBoxLayout()
         layout_estado.addStretch() 
+        
         self.indicador_estado = QLabel()
         self.indicador_estado.setFixedSize(12, 12)
         self.indicador_estado.setStyleSheet("background-color: #00B3AA; border-radius: 6px;") 
@@ -634,9 +661,10 @@ class MainWindow(QWidget):
         self.resize(ANCHO, ALTO)
         self.setWindowTitle(TITULO)
         
-        # Hoja de estilos principal, ACA mejor se simplifica porque el desastre de antes no era normal
+        # SOLO el fondo global (#f7e1d0) 
         self.setStyleSheet("""
-            QWidget { background-color: #F9F5F0; color: #31295f; font-family: 'Segoe UI', sans-serif; }
+            MainWindow, QStackedWidget { background-color: #f7e1d0; }
+            QWidget { color: #31295f; font-family: 'Segoe UI', sans-serif; }
             QPushButton {
                 background-color: #E9445F; color: #F9F5F0; border: none; border-radius: 12px;
                 padding: 10px 24px; font-size: 14px; font-weight: bold;
