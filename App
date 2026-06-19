@@ -19,7 +19,7 @@ class EditorMinimalista(QTextEdit):
         self.ventana_notas = ventana_notas
         self.setAcceptDrops(True)
         # Centrar las fuentes para mejor lectura
-        # UI DECORACIÓN: Refinamiento de tipografía, espaciado interno (padding) y foco interactivo suave
+        # DECORACIÓN: Refinamiento de tipografía, espaciado interno (padding) y foco suave
         self.setStyleSheet("""
             QTextEdit {
                 border: 1px solid rgba(49, 41, 95, 0.08);
@@ -123,7 +123,7 @@ class MenuPrincipal(QWidget):
         layout = QVBoxLayout()
         layout.setSpacing(25)
         
-        titulo = QLabel("Bienvenida")
+        titulo = QLabel("Welcome!")
         # UI DECORACIÓN: Refinamiento de interlineado, text-shadow simulado por render y suavizado de tracking
         titulo.setStyleSheet("""
             font-size: 84px;
@@ -176,7 +176,7 @@ class CalendarioPantalla(QWidget):
         self.calendario.clicked.connect(self.cargar_recordatorio)
         
         # Ajuste de colores en 'QCalendarWidget QTableView' y 'QHeaderView' para que se vean los números y encabezados que se me perdieron con el contraste
-        # UI DECORACIÓN: Añadida sombra difusa perimetral y bordes limpios translúcidos, pulido estético completo de la tabla del calendario
+        # DECORACIÓN: Añadida sombra difusa perimetral y bordes limpios translúcidos, pulido estético completo de la tabla del calendario
         estilo = """
             QCalendarWidget { 
                 border: 1px solid rgba(49, 41, 95, 0.15);
@@ -612,7 +612,7 @@ class NotasPantalla(QWidget):
         self.input_titulo.setStyleSheet("border: none; font-size: 34px; font-weight: 300; font-family: 'Segoe UI Light', sans-serif; color: #690571; background: transparent;")
         
         self.input_cuerpo = EditorMinimalista(self)
-        self.input_cuerpo.setPlaceholderText("Empieza a escribir... Puedes arrastrar imágenes aquí.")
+        self.input_cuerpo.setPlaceholderText("Empieza a escribir... ")
         
         self.input_titulo.textChanged.connect(self.iniciar_debounce)
         self.input_cuerpo.textChanged.connect(self.iniciar_debounce)
