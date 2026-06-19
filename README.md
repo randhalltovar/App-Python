@@ -1,23 +1,33 @@
 # App-Python
-PYQT5
-Esta aplicación nace de la necesidad personal de tener un entorno digital que realmente se adapte a mi forma de trabajar y escribir, alejándome de las opciones genéricas que terminan estorbando más de lo que ayudan. Es un proyecto desarrollado con PyQt5 pensado para ser minimalista, funcional y totalmente enfocado en la productividad sin complicaciones innecesarias. La idea central es reunir en un solo lugar tres pilares fundamentales para mi día a día: la organización del tiempo, el registro rápido de ideas y la construcción de mundos narrativos.
+La arquitectura de la aplicación se distribuye en tres pantallas principales conectadas de manera secuencial a través de un controlador de vistas dinámico:
 
-Estructura de la Aplicación
-Al abrir la aplicación, te recibirá un menú de inicio directo que te permite saltar a cualquiera de los tres módulos principales sin rodeos. La interfaz está diseñada para no abrumar, dejando que el contenido sea el protagonista.
+1. Panel de Bienvenida (Menú Principal)
+Al iniciar el programa, se despliega una pantalla de bienvenida estilizada con un encabezado de gran formato. Este módulo actúa como distribuidor central y dispone de dos botones principales de navegación:
 
-1. Calendario
-Este apartado busca ser la antítesis de las aplicaciones complejas y saturadas de funciones que abundan en las tiendas. Mi objetivo es ofrecer una vista limpia y sencilla donde gestionar mis días sea intuitivo y rápido, enfocándose únicamente en lo que es útil y necesario para mantener el control de mi agenda personal.
+  * Abrir Calendario: Redirecciona de forma inmediata a la sección de agenda y control de fechas.
+  * Abrir Notas: Da acceso al entorno del bloc de notas avanzado con almacenamiento multimedia.
 
-2. Notas
-Aquí la flexibilidad es la prioridad. He diseñado este módulo para que cada quien elija cómo prefiere organizar su pensamiento: ya sea a través de hojas sueltas, un estilo de libreta clásica o el formato tradicional de notas rápidas. La idea es que sea un espacio minimalista donde la personalización del estilo permita sentirse cómodo escribiendo, integrando la posibilidad de añadir imágenes para ilustrar ideas y listas de tareas para no dejar nada pendiente.
+2. Módulo de Calendario y Recordatorios 📅
+Esta sección implementa un diseño de alto contraste optimizado específicamente para garantizar la legibilidad absoluta de los números, encabezados de días y barras de navegación.
+  * Navegación y Estructura: El calendario muestra una cuadrícula visible que delimita con precisión cada día del mes. Los fines de semana se destacan automáticamente con un tono rojizo diferenciado para agilizar la lectura visual.
+  * Creación de Recordatorios: Al hacer clic sobre cualquier celda numérica, el sistema actualiza el encabezado inferior con la fecha seleccionada y habilita un panel de edición. El usuario puede transcribir el texto deseado en la caja de entrada y presionar el botón Guardar. Los días con eventos asignados se renderizan con el fondo del color elegido para indicar una actividad programada.
+    
+  * Menú de Opciones Avanzadas: Situado en la esquina superior del panel de edición, este botón despliega un menú interactivo con las siguientes capacidades:
+    - Configuración de Repeticiones: Permite automatizar recordatorios con frecuencia Anual (ideal para aniversarios o cumpleaños) o Mensual (útil para la gestión de pagos recurrentes).
+    - Selector de Color: Abre una paleta de colores nativa del sistema para clasificar las notas por prioridades o categorías visuales.
+      
+  * Eliminación de Eventos: Si se selecciona un día que ya contiene información almacenada, la interfaz muestra de manera dinámica un botón para Eliminar, el cual remueve el registro del sistema y limpia la cuadrícula.
 
-3. Writing
-Este es el corazón de la aplicación para cuando toca escribir historias. Permite crear carpetas independientes para cada libro, proyecto o idea dispersa, manteniendo todo organizado. Dentro de cada carpeta, el sistema permite desplegar herramientas específicas para el escritor:
+3. Entorno de Notas Avanzado 📝
+Un bloc de notas diseñado bajo un enfoque de escritura fluida que combina herramientas multimedia con automatizaciones de resguardo crítico.
 
-Capítulos: Para redactar la historia de forma estructurada.
+  * Organización y Búsqueda: El panel izquierdo centraliza la lista de documentos creados, mostrando el título y la última fecha de edición. Dispone de un botón para generar una + Nueva Nota de forma instantánea y una barra de búsqueda superior que filtra los elementos en tiempo real a medida que se escribe.
 
-Ideas sin terminar: Un cajón de sastre donde dejar notas rápidas, escenas sueltas o inspiraciones, permitiendo incluir imágenes para que no se pierda la esencia visual de la idea.
+  * Sistema de Autoguardado Inteligente (Debounce): La aplicación carece deliberadamente de un botón manual de guardado para evitar pérdidas de información por descuidos. Integra un temporizador automático con un retraso (debounce) de 300 milisegundos; cada vez que el usuario detiene la escritura, el sistema procesa y resguarda los cambios en segundo plano.
 
-Línea de tiempo: Una herramienta para visualizar el orden cronológico de los eventos y no perder el hilo de la trama.
+💾 Persistencia de Datos y Respaldos
+Tardis gestiona la persistencia de datos de manera local y descentralizada en el mismo directorio de ejecución de la aplicación, utilizando archivos de texto plano estructurados en formato JSON:
 
-Fichas de personajes: Un apartado dedicado a construir perfiles detallados de los protagonistas y antagonistas, donde se pueden adjuntar imágenes para visualizar mejor cómo lucen esos personajes que cobran vida en las páginas.
+recordatorios.json: Almacena la relación de fechas, textos y códigos de color asociados a la agenda del calendario.
+notes_db.json: Resguarda los identificadores únicos, títulos, cuerpos de texto formateados en HTML (incluyendo la codificación de imágenes incrustadas) y las marcas de tiempo de las notas.
+
